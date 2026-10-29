@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaevi System Map MAIN</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    :root {
+      --header-bg: #0f1b2d; --header-bg2: #1c2f4a; --header-text: #ffffff;
+      --bg-color: #f3f5f9; --card-bg: #ffffff; --text: #1f2937; --text-muted: #6b7280;
+      --line: #e5e7eb; --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.06);
+      --shadow-hover: 0 6px 20px rgba(16,24,40,.12); --border-radius: 14px;
+      --brand: #2563eb;
+
+      /* 섹션별 강조 색상 (accent / 연한 배경) */
+      --c-gray: #64748b;   --c-gray-bg: #f1f5f9;
+      --c-blue: #2563eb;   --c-blue-bg: #eff6ff;
+      --c-orange: #ea580c; --c-orange-bg: #fff7ed;
+      --c-purple: #7c3aed; --c-purple-bg: #f5f3ff;
+      --c-green: #16a34a;  --c-green-bg: #f0fdf4;
+      --c-mint: #0891b2;   --c-mint-bg: #ecfeff;
+      --c-indigo: #4f46e5; --c-indigo-bg: #eef2ff;
+      --c-rose: #e11d48;   --c-rose-bg: #fff1f2;
+      --c-amber: #d97706;  --c-amber-bg: #fffbeb;
+      --c-yellow: #ca8a04; --c-yellow-bg: #fefce8;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text); }
+
+    /* ===== Header ===== */
+    .header { position: sticky; top: 0; z-index: 10; background: linear-gradient(120deg, var(--header-bg), var(--header-bg2)); color: var(--header-text); box-shadow: 0 2px 10px rgba(0,0,0,.15); }
+    .header-top { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-logo { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #22d3ee); display: grid; place-items: center; font-weight: 800; font-size: 18px; flex-shrink: 0; }
+    .header h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; white-space: nowrap; }
+    .header .sub { font-size: 12px; color: #9fb3cf; margin-top: 2px; }
+
+    .header-right { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #e9ecef; }
+    .control-btn { background-color: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); color: #fff; padding: 7px 13px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; transition: background-color .2s; }
+    .control-btn:hover { background-color: rgba(255,255,255,.22); }
+    #datetime-display { font-variant-numeric: tabular-nums; font-weight: 600; background: rgba(255,255,255,.08); padding: 7px 12px; border-radius: 8px; white-space: nowrap; }
+
+    /* 검색 + 부문 바로가기 */
+    .toolbar { max-width: 1200px; margin: 0 auto; padding: 0 24px 14px; display: flex; flex-direction: column; gap: 10px; }
+    .search-box { position: relative; }
+    .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #94a3b8; }
+    #search-input { width: 100%; padding: 11px 40px 11px 42px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.95); font-size: 15px; font-family: inherit; color: var(--text); outline: none; transition: box-shadow .2s; }
+    #search-input:focus { box-shadow: 0 0 0 3px rgba(59,130,246,.45); }
+    #search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: #e2e8f0; color: #475569; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: none; font-size: 14px; line-height: 24px; padding: 0; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex-shrink: 0; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #dbe6f5; padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; transition: background-color .2s; }
+    .chip:hover { background: rgba(255,255,255,.18); color: #fff; }
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ===== Main ===== */
+    .main-container { max-width: 1200px; margin: 0 auto; padding: 22px 24px 40px; }
+    .dashboard { display: flex; flex-direction: column; gap: 14px; }
+
+    .card { background-color: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--line); border-left: 5px solid var(--accent); scroll-margin-top: 150px; }
+    .card-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; transition: background-color .2s; }
+    .card-header:hover { background-color: var(--accent-bg); }
+    .card-header.active { background-color: var(--accent-bg); border-bottom: 1px solid var(--line); }
+    .section-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+    .section-title { font-weight: 700; font-size: 17px; flex: 1; }
+    .badge { font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 9px; }
+    .chevron { width: 20px; height: 20px; color: var(--text-muted); transition: transform .3s; }
+    .card-header.active .chevron { transform: rotate(180deg); }
+
+    /* 초기 상태는 접혀있음 (grid-rows 0fr → 1fr 애니메이션) */
+    .card-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease-out; }
+    .card-header.active + .card-content { grid-template-rows: 1fr; }
+    .card-content-wrap { overflow: hidden; }
+    .card-content-inner { padding: 18px 20px 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+
+    .card-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background-color: #fff; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; color: var(--text); text-decoration: none; min-height: 56px; transition: border-color .2s, box-shadow .2s, transform .15s; word-break: keep-all; }
+    .card-item:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+    .item-icon { width: 30px; height: 30px; border-radius: 8px; background: var(--accent-bg); color: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+    .item-icon svg { width: 16px; height: 16px; }
+    .item-text { flex: 1; line-height: 1.35; }
+    .item-arrow { width: 16px; height: 16px; color: #cbd5e1; flex-shrink: 0; transition: color .2s, transform .2s; }
+    .card-item:hover .item-arrow { color: var(--accent); transform: translate(2px, -2px); }
+    .card-item mark { background: #fde68a; color: inherit; border-radius: 3px; padding: 0 1px; }
+
+    #loading, .empty-msg { text-align: center; padding: 60px 20px; font-size: 16px; color: var(--text-muted); }
+    .spinner { width: 34px; height: 34px; border: 3px solid #dbe3ee; border-top-color: var(--brand); border-radius: 50%; margin: 0 auto 14px; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-msg { color: #dc2626; }
+    .footer { text-align: center; font-size: 12px; color: #9ca3af; padding: 0 0 24px; }
+
+    @media (max-width: 768px) {
+      .header-top { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 16px; }
+      .header-right { width: 100%; justify-content: space-between; }
+      .toolbar { padding: 0 16px 12px; }
+      .main-container { padding: 16px; }
+      .card-content-inner { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-logo">C</div>
+        <div>
+          <h1>Chaevi System Map MAIN</h1>
+          <div class="sub" id="summary-text">시스템 목록을 불러오는 중…</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div>
+          <button class="control-btn" onclick="toggleAll(true)">전체 펴기</button>
+          <button class="control-btn" onclick="toggleAll(false)">전체 접기</button>
+        </div>
+        <div id="datetime-display"></div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="search-input" type="text" placeholder="시스템 이름 검색 (단축키 /)" autocomplete="off">
+        <button id="search-clear" title="지우기">✕</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div id="loading"><div class="spinner"></div>데이터를 불러오는 중입니다...</div>
+    <div id="dashboard-container" class="dashboard"></div>
+  </main>
+  <div class="footer">© Chaevi · System Map</div>
+
+  <script>
+    // ★ GitHub Pages 등 외부 사이트에서 사용할 때 필요한 Apps Script 웹 앱 배포 URL (…/exec)
+    //   Apps Script 안에서 실행될 때는 사용되지 않습니다.
+    const API_URL = 'https://script.google.com/macros/s/AKfycbx25vrlZiqE5ZvQ2wRzQzGrbHBVYKu-OCVMblCICGlLTkQ3AnmIM6mn6YX3htOFtgMI/exec';
+
+    const ICON_LINK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg>';
+    const ICON_ARROW = '<svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+    const ICON_CHEVRON = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+
+    let dashboardData = [];
+    let savedOpenState = null; // 검색 시작 전 펼침 상태 저장
+
+    function updateTime() {
+        const now = new Date();
+        const timeString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+        document.getElementById('datetime-display').textContent = timeString;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateTime();
+      setInterval(updateTime, 1000);
+      setupSearch();
+      loadDashboardData(); // 앱 시작 시 바로 데이터 로딩
+    });
+
+    function showLoadError(message) {
+      document.getElementById('loading').innerHTML = `<span class="error-msg">서버 오류 발생: ${escapeHtml(message)}</span>`;
+    }
+
+    function loadDashboardData() {
+      // 1) Apps Script 내부 실행: 기존 방식 유지
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(renderDashboard)
+          .withFailureHandler(error => showLoadError(error.message))
+          .getDashboardData();
+        return;
+      }
+
+      // 2) GitHub Pages 등 외부 사이트: 웹 앱 JSON API 호출
+      fetch(API_URL + '?api=data')
+        .then(res => {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(renderDashboard)
+        .catch(err => showLoadError(err.message));
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // 섹션별 색상 지정 (기존 키워드 규칙 유지 + 추가 부문 색상)
+    function getSectionColor(name) {
+      let key = 'gray';
+      if (name.includes('구매')) key = 'blue';
+      if (name.includes('자재')) key = 'orange';
+      if (name.includes('생산')) key = 'purple';
+      if (name.includes('품질')) key = 'green';
+      if (name.includes('기준정보')) key = 'mint';
+      if (name.includes('혁신')) key = 'indigo';
+      if (name.includes('AS')) key = 'rose';
+      if (name.includes('영업')) key = 'amber';
+      if (name.includes('전기')) key = 'yellow';
+      return { accent: `var(--c-${key})`, bg: `var(--c-${key}-bg)` };
+    }
+
+    function renderDashboard(data) {
+      const container = document.getElementById('dashboard-container');
+      const loading = document.getElementById('loading');
+
+      if (data.error) {
+        loading.innerHTML = `<span class="error-msg">${escapeHtml(data.message)}</span>`;
+        return;
+      }
+
+      loading.style.display = 'none';
+      dashboardData = data;
+      let html = '';
+      let chipsHtml = '';
+      let totalItems = 0;
+
+      // 시트에서 가져온 전체 데이터(data)를 모두 화면에 출력
+      data.forEach((section, idx) => {
+        const name = String(section.section);
+        const color = getSectionColor(name);
+        let buttonsHtml = '';
+
+        // 해당 섹션 내의 모든 아이템(버튼) 추가
+        section.items.forEach(item => {
+            const text = String(item.text);
+            buttonsHtml += `
+              <a class="card-item" href="${escapeHtml(item.url)}" target="_blank" data-text="${escapeHtml(text.toLowerCase())}">
+                <span class="item-icon">${ICON_LINK}</span>
+                <span class="item-text">${escapeHtml(text)}</span>
+                ${ICON_ARROW}
+              </a>`;
+        });
+
+        if (buttonsHtml) {
+            totalItems += section.items.length;
+            html += `
+            <div class="card" id="section-${idx}" style="--accent:${color.accent}; --accent-bg:${color.bg};">
+                <div class="card-header">
+                    <div class="section-icon">${escapeHtml(name.charAt(0))}</div>
+                    <div class="section-title">${escapeHtml(name)}</div>
+                    <span class="badge">${section.items.length}</span>
+                    ${ICON_CHEVRON}
+                </div>
+                <div class="card-content">
+                    <div class="card-content-wrap">
+                        <div class="card-content-inner">${buttonsHtml}</div>
+                    </div>
+                </div>
+            </div>`;
+            chipsHtml += `<button class="chip" data-target="section-${idx}"><span class="dot" style="background:${color.accent}"></span>${escapeHtml(name)}</button>`;
+        }
+      });
+
+      // 만약 시트에 내용이 없다면 안내 메시지 출력
+      if (html === '') {
+        container.innerHTML = '<div class="empty-msg">표시할 데이터가 없습니다. 구글 시트를 확인해주세요.</div>';
+        document.getElementById('summary-text').textContent = '등록된 시스템 없음';
+      } else {
+        container.innerHTML = html + '<div class="empty-msg" id="no-result" style="display:none;">검색 결과가 없습니다.</div>';
+        document.getElementById('chips').innerHTML = chipsHtml;
+        document.getElementById('summary-text').textContent = `${data.length}개 부문 · ${totalItems}개 시스템`;
+        setupAccordion();
+        setupChips();
+      }
+    }
+
+    function setupAccordion() {
+      const headers = document.querySelectorAll('.card-header');
+      headers.forEach(header => {
+        header.addEventListener('click', () => {
+          header.classList.toggle('active'); // 펴기/접기
+        });
+      });
+    }
+
+    function toggleAll(expand) {
+        const headers = document.querySelectorAll('.card-header');
+        headers.forEach(header => {
+            if (expand) header.classList.add('active');    // 전체 펴기
+            else header.classList.remove('active');        // 전체 접기
+        });
+    }
+
+    // 부문 바로가기: 해당 섹션을 펼치고 이동
+    function setupChips() {
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const card = document.getElementById(chip.dataset.target);
+          if (!card) return;
+          card.style.display = '';
+          card.querySelector('.card-header').classList.add('active');
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    // 실시간 검색
+    function setupSearch() {
+      const input = document.getElementById('search-input');
+      const clearBtn = document.getElementById('search-clear');
+
+      input.addEventListener('input', () => applySearch(input.value));
+      clearBtn.addEventListener('click', () => { input.value = ''; applySearch(''); input.focus(); });
+      document.addEventListener('keydown', e => {
+        if (e.key === '/' && document.activeElement !== input) { e.preventDefault(); input.focus(); }
+        if (e.key === 'Escape' && document.activeElement === input) { input.value = ''; applySearch(''); input.blur(); }
+      });
+    }
+
+    function applySearch(raw) {
+      const q = raw.trim().toLowerCase();
+      document.getElementById('search-clear').style.display = q ? 'block' : 'none';
+      const cards = document.querySelectorAll('.card');
+      if (!cards.length) return;
+
+      // 검색 시작 시 현재 펼침 상태 저장
+      if (q && savedOpenState === null) {
+        savedOpenState = Array.from(cards).map(c => c.querySelector('.card-header').classList.contains('active'));
+      }
+
+      let anyMatch = false;
+      cards.forEach((card, i) => {
+        const header = card.querySelector('.card-header');
+        const items = card.querySelectorAll('.card-item');
+        let count = 0;
+        items.forEach(item => {
+          const textEl = item.querySelector('.item-text');
+          const original = textEl.textContent;
+          const hit = !q || item.dataset.text.includes(q);
+          item.style.display = hit ? '' : 'none';
+          if (hit) count++;
+          textEl.innerHTML = q && hit ? highlight(original, q) : escapeHtml(original);
+        });
+        card.querySelector('.badge').textContent = q ? `${count}/${items.length}` : items.length;
+
+        if (q) {
+          card.style.display = count ? '' : 'none';
+          header.classList.toggle('active', count > 0);
+          if (count) anyMatch = true;
+        } else {
+          card.style.display = '';
+          if (savedOpenState) header.classList.toggle('active', savedOpenState[i]);
+        }
+      });
+
+      if (!q) savedOpenState = null;
+      document.getElementById('no-result').style.display = (q && !anyMatch) ? 'block' : 'none';
+    }
+
+    function highlight(text, q) {
+      const idx = text.toLowerCase().indexOf(q);
+      if (idx < 0) return escapeHtml(text);
+      return escapeHtml(text.slice(0, idx)) + '<mark>' + escapeHtml(text.slice(idx, idx + q.length)) + '</mark>' + escapeHtml(text.slice(idx + q.length));
+    }
+  </script>
+</body>
+</html>
